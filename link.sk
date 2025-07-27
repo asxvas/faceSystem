@@ -1,0 +1,172 @@
+#config
+options:
+    token: token
+    prefix: <##7BFF66>&lʟɪɴᴋɪɴɢ &8→
+    channel_id_linking_message: 1283443978859188245
+    guild_id: 1278400091375534203
+    Botname: hastegen
+
+define new bot named "Linking":
+    token: "{@token}"
+    intents: default intents
+    auto reconnect: true
+    policy: all
+
+on load:
+    set {_reset} to new slash command named "resetcodes" with description "Reset the data of the linking plugin!"
+
+    update command {_reset} locally in guild with id "{@guild_id}"
+
+
+discord command linkmsg:
+    prefixes: !
+    trigger:
+        if event-member has discord permission administrator:
+            set {_buttons} to new components row
+            add new success button with url "linka-button" named "Link your account here!" with reaction "white_check_mark" to components of {_buttons}
+            make embed:
+                set title of embed to "Minecraft to Discord Linking"
+                set description of embed to "Press the button bellow to enter your code to link your Discord account to your Minecraft Account!"
+                add field named "No code?" with value "If you do not have a code, use the command `/link` in the Minecraft server to recieve your code, then press the button. You will recieve **2 Keyall Crate Keys and 4 Ore Crate Keys** for free" to fields of embed
+                set footer of embed to "{@Botname}.minehut.gg | /link"
+                set embed color of the embed to blue
+            post message last embed with components {_buttons} to channel with id "{@channel_id_linking_message}"
+        else:
+            make embed:
+                set title of embed to "Error!"
+                set description of embed to "Seems like you don't have permission to run this command."
+                set embed color of the embed to red
+            reply with hidden last embed
+
+on button click:
+    if discord id of event-button is "linka-button":
+        set {_modula} to new modal with id "linker-modal" named "Linking"
+
+        set {_code} to new components row
+        set {_code} to new short text input with id "coder-modal" named "WHAT IS YOUR CODE AFTER DOING /LINK INGAME?"
+        set required state of {_code} to true
+        set minimum range of {_opt} to 6
+        set maximum range of {_opt} to 6
+        set placeholder of {_code} to "Example: 123456"
+        add {_code} to the rows of {_modula}
+        
+        show {_modula} to the user
+
+command link:
+    trigger:
+        set {_code} to a random integer between 111111 and 999999
+        set {code::%{_code}%} to player
+        send "&7"
+        send "&7"
+        send "&7"
+        
+        set {_Comp} to click event to suggest command "%{_code}%"
+        set {_Text} to text component from "{@prefix} &fʏᴏᴜʀ ʟɪɴᴋɪɴɢ ᴄᴏᴅᴇ ɪs &8(<##7BFF66>%{_code}%&8) &fᴊᴏɪɴ ᴜsɪɴɢ <##7BFF66>/discord&f ᴀɴᴅ ᴘᴜᴛ ᴛʜᴇ ᴄᴏᴅᴇ ɪɴ <##7BFF66>#Linking&f ᴛᴏ ʀᴇᴄᴇɪᴠᴇ <##7BFF66>2x Keyall Keys &fᴀɴᴅ <##7BFF66>4x Ore Keys&f!"
+        add {_Comp} to {_Text}
+        add hover event showing "<##7BFF66>ᴄʟɪᴄᴋ ᴍᴇ ᴛᴏ ᴄᴏᴘʏ" to {_Text}
+        send component {_Text} to player
+        send "&7"
+        send "&7"
+        wait 1 minute
+        delete {code::%{_code}%}
+#cool stuff bellow this
+
+on modal receive:
+    if event-string = "linker-modal":
+        set {_code} to value of text input with id "coder-modal"
+        if {discord::%discord id of event-user%::player} is set:
+            make embed:
+                set title of embed to "Already Used"
+                set description of embed to "You may not link twice!"
+                set embed color of the embed to yellow
+            reply with hidden last embed
+            stop trigger
+
+        if {discord::%discord id of event-user%::player} isn't set:
+            if {code::%{_code}%} isn't set:
+                make embed:
+                    set title of embed to "Wrong Code!"
+                    set footer of embed to "This is not a valid code. Please use `/link` ingame to view your code again."
+                    set embed color of the embed to red
+                reply with hidden last embed
+                stop trigger
+            else:
+                set {discord::%discord id of event-user%::player} to {code::%{_code}%}
+                set {discord::%{_code}%} to discord id of event-user
+                add {_code} to {list::codes::*}
+                add discord id of event-user to {linking::list::members::*}
+                execute console command "crate key give %{discord::%discord id of event-user%::player}% ore 4" 
+                execute console command "crate key give %{discord::%discord id of event-user%::player}% keyall 2"
+
+                #! facey part
+                set {_linker::*} to getSkinPixels({discord::%discord id of event-user%::player})
+
+                broadcast "&7"
+                broadcast "%{_linker::1}%"
+                broadcast "%{_linker::2}% <##7BFF66>%tinyText({discord::%discord id of event-user%::player})% &fʜᴀs ᴊᴜsᴛ ʟɪɴᴋᴇᴅ ᴛʜᴇʏ'ʀᴇ"
+                broadcast "%{_linker::3}% &fᴀᴄᴄᴏᴜɴᴛ! ʟɪɴᴋ ʏᴏᴜʀ ᴀᴄᴄᴏᴜɴᴛ ʙʏ"
+                broadcast "%{_linker::4}% &fᴅᴏɪɴɢ <##7BFF66>/ʟɪɴᴋ"
+                broadcast "%{_linker::5}% &fʏᴏᴜ ᴡɪʟʟ ʀᴇᴄɪᴇᴠᴇ ғʀᴇᴇ <##7BFF66>ʀᴇᴡᴀʀᴅs"
+                broadcast "%{_linker::6}% &fᴜᴘᴏɴ ʟɪɴᴋɪɴɢ!"
+                broadcast "%{_linker::7}% <##7BFF66>/ᴅɪsᴄᴏʀᴅ"
+                broadcast "%{_linker::8}%"
+                broadcast "&7"
+
+                make embed:
+                    set title of embed to "Success!"
+                    set description of embed to "You have successfully linked your discord account %nl%You received your rewards!"
+                    set embed color of the embed to yellow
+                reply with hidden last embed
+                
+                stop trigger
+            stop trigger
+        
+
+discord command resetcodes:
+    prefixes: !
+    trigger:
+        if event-member has discord permission administrator:
+
+            loop {discord::*}:
+                delete {discord::%loop-value%::player}
+            clear {discord::*}
+
+            loop {list::codes::*}:
+                delete {code::%loop-value%}
+                delete {discord::%loop-value%}
+            clear {list::codes::*}
+
+            loop {linking::list::members::*}:
+                delete {discord::%loop-value%::player}
+            clear {linking::list::members::*}
+            
+            
+
+            make embed:
+                set title of embed to "Success!"
+                set description of embed to "Successfully reset all the plugin data! Users will now be able to re-claim there link rewards"
+                set embed color of embed to blue
+            reply with hidden last embed
+
+        else:
+
+            make embed:
+                set title of embed to "Error!"
+                set description of embed to "Seems like you don't have permission to run this command."
+                set embed color of the embed to red
+            reply with hidden last embed
+
+on load:
+	set {-tiny::*} to "ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ" split at ""
+	set {_lower} to "abcdefghijklmnopqrstuvwxyz"
+	set {-lower::*} to {_lower} split at ""
+	set {-upper::*} to (uppercase {_lower}) split at ""
+
+#! Function to make tiny text
+
+local function tinyText(text: text) :: text:
+	loop {-tiny::*}:
+		replace {-lower::%loop-index%} and {-upper::%loop-index%} with loop-value in {_text}
+		# puts back color codes
+		replace "§%loop-value%" with "§%{-lower::%loop-index%}%" in {_text}
+	return {_text}
