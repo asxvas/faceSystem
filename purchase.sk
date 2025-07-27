@@ -1,0 +1,32 @@
+command purchase <offline player> <number> <text>:
+    permission: op
+    trigger:
+        set {_pixels::*} to getSkinPixels(arg-1)
+        set {_player} to "%arg-1%"
+        broadcast "&7"
+        broadcast "%{_pixels::1}%"
+        broadcast "%{_pixels::2}% <##7BFF66>%tinyText({_player})% &fᴊᴜsᴛ ᴘᴜʀᴄʜᴀsᴇᴅ"
+        broadcast "%{_pixels::3}% <##7BFF66>%tinyText(arg-3)% &fʀᴀɴᴋ!"
+        broadcast "%{_pixels::4}% &fᴘʀɪᴄᴇ: <##7BFF66>£%arg-2%&f!"
+        broadcast "%{_pixels::5}%"
+        broadcast "%{_pixels::6}% &fᴡᴀɴᴛ ᴛᴏ sᴜᴘᴘᴏʀᴛ ᴏᴜʀ sᴇʀᴠᴇʀ?"
+        broadcast "%{_pixels::7}% &fᴄʜᴇᴄᴋᴏᴜᴛ <##7BFF66>/ʙᴜʏ"
+        broadcast "%{_pixels::8}%"
+        broadcast "&7"
+
+        play sound "ui.toast.challenge_complete" with pitch 0.1 to all players
+
+on load:
+	set {-tiny::*} to "ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ" split at ""
+	set {_lower} to "abcdefghijklmnopqrstuvwxyz"
+	set {-lower::*} to {_lower} split at ""
+	set {-upper::*} to (uppercase {_lower}) split at ""
+
+#! Function to make tiny text
+
+local function tinyText(text: text) :: text:
+	loop {-tiny::*}:
+		replace {-lower::%loop-index%} and {-upper::%loop-index%} with loop-value in {_text}
+		# puts back color codes
+		replace "§%loop-value%" with "§%{-lower::%loop-index%}%" in {_text}
+	return {_text}
